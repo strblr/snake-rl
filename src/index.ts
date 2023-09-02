@@ -5,6 +5,10 @@ import blessed from "blessed";
 const WIDTH = 80;
 const HEIGHT = 30;
 const FPS = 12;
+const UP = 0;
+const DOWN = 1;
+const LEFT = 2;
+const RIGHT = 3;
 
 // Types
 
@@ -13,19 +17,14 @@ interface Point {
   y: number;
 }
 
-enum Direction {
-  Up,
-  Down,
-  Left,
-  Right
-}
+type Direction = typeof UP | typeof DOWN | typeof LEFT | typeof RIGHT;
 
 // Game class to manage the snake state
 
 class GameEnvironment {
   private snake: Point[] = [];
   private apple: Point = { x: 0, y: 0 };
-  private direction = Direction.Right;
+  private direction: Direction = RIGHT;
   done = false;
 
   constructor() {
@@ -39,7 +38,7 @@ class GameEnvironment {
       { x: 12, y: 10 }
     ];
     this.generateApple();
-    this.direction = Direction.Right;
+    this.direction = RIGHT;
     this.done = false;
   }
 
@@ -64,16 +63,16 @@ class GameEnvironment {
     const head = this.snake[this.snake.length - 1];
     let newHead: Point;
     switch (this.direction) {
-      case Direction.Up:
+      case UP:
         newHead = { x: head.x, y: head.y - 1 };
         break;
-      case Direction.Down:
+      case DOWN:
         newHead = { x: head.x, y: head.y + 1 };
         break;
-      case Direction.Left:
+      case LEFT:
         newHead = { x: head.x - 1, y: head.y };
         break;
-      case Direction.Right:
+      case RIGHT:
         newHead = { x: head.x + 1, y: head.y };
         break;
     }
@@ -131,16 +130,16 @@ class KeyboardAgent {
         case "escape":
           return process.exit(0);
         case "up":
-          this.buffer.push(Direction.Up);
+          this.buffer.push(UP);
           break;
         case "down":
-          this.buffer.push(Direction.Down);
+          this.buffer.push(DOWN);
           break;
         case "left":
-          this.buffer.push(Direction.Left);
+          this.buffer.push(LEFT);
           break;
         case "right":
-          this.buffer.push(Direction.Right);
+          this.buffer.push(RIGHT);
           break;
         case "space":
           this.timer ? this.stop() : this.start();

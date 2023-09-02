@@ -1,0 +1,44 @@
+{
+  "name": "snake-rl",
+  "version": "1.0.0",
+  "description": "Reinforcement learning for the game of snake",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "tsx ./src/index.ts",
+    "watch": "tsx watch ./src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/strblr/snake-rl.git"
+  },
+  "keywords": [
+    "reinforcement",
+    "learning",
+    "dqn",
+    "snake",
+    "game",
+    "deep",
+    "q",
+    "learning"
+  ],
+  "author": "strblr",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/strblr/snake-rl/issues"
+  },
+  "homepage": "https://github.com/strblr/snake-rl#readme",
+  "devDependencies": {
+    "@tsconfig/node18": "^18.2.1",
+    "@types/blessed": "^0.1.22",
+    "prettier": "^3.0.3",
+    "tsx": "^3.12.8",
+    "typescript": "^5.2.2"
+  },
+  "prettier": {
+    "trailingComma": "none",
+    "arrowParens": "avoid"
+  },
+  "dependencies": {
+    "blessed": "^0.1.81"
+  }
+}

@@ -39,6 +39,8 @@
     "arrowParens": "avoid"
   },
   "dependencies": {
+    "@tensorflow/tfjs": "^4.10.0",
+    "@tensorflow/tfjs-node": "^4.10.0",
     "blessed": "^0.1.81"
   }
 }

@@ -201,10 +201,10 @@
   resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-layers/-/tfjs-layers-4.10.0.tgz#0fdd9295f4da698a7417afb34d4c929c3b079ac4"
   integrity sha512-SLZWnuDF98WmmJQ5NhsXJFlJPwoKxfLowvAHTlLz+Q1Po4juZVZ+BkatRsqrI2sA2B0IIu2TJp4VEAFWMqzTTg==
 
-"@tensorflow/tfjs-node@^4.10.0":
+"@tensorflow/tfjs-node-gpu@^4.10.0":
   version "4.10.0"
-  resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-node/-/tfjs-node-4.10.0.tgz#8c65b43bbbba12ce141f6f2b9c42ea8671a95240"
-  integrity sha512-zBpblHiZCcDuS6Fcx3Wj62Tq6veGrqvcVcjFtTyYeBxSllf8VUYO5w+iaFL284RyRwATFlmbC39UKceMo+7XSQ==
+  resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-node-gpu/-/tfjs-node-gpu-4.10.0.tgz#693d0f2962e95f30dd230f1f1215bf6d07a6463f"
+  integrity sha512-iSyYC5yUcjIihrl6ckpx74vMEgkUUBk9AkSNSwKgEv4p0ZC/OkDc9Nz89WtjZJVHoLnwsKZ6kK+VtcYUWIstpQ==
   dependencies:
     "@mapbox/node-pre-gyp" "1.0.9"
     "@tensorflow/tfjs" "4.10.0"
@@ -215,7 +215,7 @@
     rimraf "^2.6.2"
     tar "^4.4.6"
 
-"@tensorflow/tfjs@4.10.0", "@tensorflow/tfjs@^4.10.0":
+"@tensorflow/tfjs@4.10.0":
   version "4.10.0"
   resolved "https://registry.yarnpkg.com/@tensorflow/tfjs/-/tfjs-4.10.0.tgz#2641d8b1e30a1ed9a02594c5a234950d44684f44"
   integrity sha512-16q6CcGEoxfg3kimBzNBrZg069GRd4Du49uyQHUMsEvpHbmU0ZpWa2zhjjZ71GlURpbD1LZIZNp6cd2Q1Eqjow==

@@ -2,7 +2,7 @@ import blessed from "blessed";
 import { GameEnvironment } from "./environment.ts";
 import { Renderer } from "./renderer.ts";
 import { KeyboardAgent } from "./keyboard-agent.ts";
-import { DQNAgent } from "./dqn-agent.ts";
+import { DqlAgent } from "./dql-agent.ts";
 import { HEIGHT, MODE, WIDTH } from "./utils.ts";
 
 // Main
@@ -36,8 +36,9 @@ function createGameBox() {
 
   const logs = blessed.box({
     top: HEIGHT + 5,
-    width: 30,
-    height: 10,
+    width: WIDTH + 2,
+    height: 12,
+    scrollable: true,
     border: {
       type: "line"
     },
@@ -64,5 +65,5 @@ const env = new GameEnvironment();
 if (MODE === "play") {
   new KeyboardAgent(box, env, renderer);
 } else {
-  new DQNAgent(box, env, renderer);
+  new DqlAgent(box, env, renderer);
 }

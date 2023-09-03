@@ -4,8 +4,8 @@ import fs from "fs";
 
 export const MODE: "play" | "train" = "train";
 export const FPS = 16;
-export const WIDTH = 50;
-export const HEIGHT = 20;
+export const WIDTH = 45;
+export const HEIGHT = 18;
 export const UP = 0;
 export const DOWN = 1;
 export const LEFT = 2;
@@ -21,10 +21,10 @@ export interface Point {
 export type Direction = typeof UP | typeof DOWN | typeof LEFT | typeof RIGHT;
 
 export interface ReplayMemory {
-  state: number[][];
+  state: number[];
   action: Direction;
   reward: number;
-  nextState: number[][];
+  nextState: number[];
   done: boolean;
 }
 

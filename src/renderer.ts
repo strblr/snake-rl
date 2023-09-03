@@ -1,5 +1,6 @@
 import blessed from "blessed";
 import { GameEnvironment } from "./environment.ts";
+import { HEIGHT, WIDTH } from "./utils.ts";
 
 // The renderer that displays the game
 
@@ -11,10 +12,12 @@ export class Renderer {
   ) {}
 
   render(env: GameEnvironment, logs: string[] = []) {
-    const displayState = env
-      .getState()
-      .map(line => line.join(""))
-      .join("\n")
+    const state: number[] = env.getState();
+    let displayState = "";
+    for (let i = 0; i < HEIGHT; i++) {
+      displayState += state.slice(i * WIDTH, (i + 1) * WIDTH).join("") + "\n";
+    }
+    displayState = displayState
       .replaceAll("0", " ")
       .replaceAll("1", "█")
       .replaceAll("2", "▒")

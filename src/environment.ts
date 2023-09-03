@@ -88,17 +88,21 @@ export class GameEnvironment {
     return this.snake.length;
   }
 
-  getState() {
-    const grid: number[][] = Array.from({ length: HEIGHT }, () =>
-      Array(WIDTH).fill(0)
+  getDistance() {
+    const head = this.snake[this.snake.length - 1];
+    return Math.sqrt(
+      Math.pow(head.x - this.apple.x, 2) + Math.pow(head.y - this.apple.y, 2)
     );
+  }
+
+  getState() {
+    const state: number[] = Array(WIDTH * HEIGHT).fill(0);
     for (const { x, y } of this.snake) {
-      grid[y][x] = 2;
+      state[y * WIDTH + x] = 2;
     }
-    grid[this.snake[this.snake.length - 1].y][
-      this.snake[this.snake.length - 1].x
-    ] = 1;
-    grid[this.apple.y][this.apple.x] = 3;
-    return grid;
+    const head = this.snake[this.snake.length - 1];
+    state[head.y * WIDTH + head.x] = 1;
+    state[this.apple.y * WIDTH + this.apple.x] = 3;
+    return state;
   }
 }

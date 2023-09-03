@@ -5,7 +5,9 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "tsx ./src/index.ts",
-    "watch": "tsx watch ./src/index.ts"
+    "watch": "tsx watch ./src/index.ts",
+    "build-docker-image": "docker build -t snake-docker .",
+    "run-docker-image": "docker run --rm -it --gpus all -p 3000:3000 -v $(pwd):/app snake-docker /bin/bash"
   },
   "repository": {
     "type": "git",
@@ -39,8 +41,7 @@
     "arrowParens": "avoid"
   },
   "dependencies": {
-    "@tensorflow/tfjs": "^4.10.0",
-    "@tensorflow/tfjs-node": "^4.10.0",
+    "@tensorflow/tfjs-node-gpu": "^4.10.0",
     "blessed": "^0.1.81"
   }
 }

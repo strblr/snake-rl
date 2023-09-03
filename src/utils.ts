@@ -4,8 +4,8 @@ import fs from "fs";
 
 export const MODE: "play" | "train" = "train";
 export const FPS = 16;
-export const WIDTH = 45;
-export const HEIGHT = 18;
+export const WIDTH = 25;
+export const HEIGHT = 10;
 export const UP = 0;
 export const DOWN = 1;
 export const LEFT = 2;

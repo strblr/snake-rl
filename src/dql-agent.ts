@@ -46,8 +46,6 @@ export class DqlAgent {
     this.model.add(tf.layers.leakyReLU({ alpha: 0.3 }));
     this.model.add(tf.layers.dense({ units: 500 }));
     this.model.add(tf.layers.leakyReLU({ alpha: 0.3 }));
-    this.model.add(tf.layers.dense({ units: 100 }));
-    this.model.add(tf.layers.leakyReLU({ alpha: 0.3 }));
     this.model.add(tf.layers.dense({ units: 24 }));
     this.model.add(tf.layers.leakyReLU({ alpha: 0.3 }));
     this.model.add(
@@ -140,14 +138,13 @@ export class DqlAgent {
     let state = this.env.getState();
     while (this.training) {
       const action = this.act(state);
-      this.env.act(action);
-      const score = this.env.getScore();
-      const reward = 2 * score - this.env.getDistance();
+      const reward = this.env.act(action);
       const nextState = this.env.getState();
       const done = this.env.done;
 
       this.remember({ state, action, reward, nextState, done });
 
+      const score = this.env.getScore();
       if (score > this.maxScore) {
         this.maxScore = score;
       }

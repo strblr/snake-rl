@@ -23,9 +23,9 @@ export class GameEnvironment {
 
   reset() {
     this.snake = [
-      { x: 10, y: 10 },
-      { x: 11, y: 10 },
-      { x: 12, y: 10 }
+      { x: 10, y: 5 },
+      { x: 11, y: 5 },
+      { x: 12, y: 5 }
     ];
     this.generateApple();
     this.direction = RIGHT;
@@ -46,7 +46,7 @@ export class GameEnvironment {
   }
 
   act(action?: Direction) {
-    if (this.done) return;
+    if (this.done) return 0;
     if (action !== undefined) {
       this.direction = action;
     }
@@ -74,24 +74,28 @@ export class GameEnvironment {
       this.snake.some(node => node.x === newHead.x && node.y === newHead.y)
     ) {
       this.done = true;
-      return;
+      return -10;
     }
     this.snake.push(newHead);
     if (newHead.x === this.apple.x && newHead.y === this.apple.y) {
       this.generateApple();
+      return 10;
     } else {
       this.snake.shift();
     }
+    if (this.getDistance(newHead) < this.getDistance(head)) {
+      return 1;
+    }
+    return -1;
   }
 
   getScore() {
     return this.snake.length;
   }
 
-  getDistance() {
-    const head = this.snake[this.snake.length - 1];
+  getDistance(point: Point) {
     return Math.sqrt(
-      Math.pow(head.x - this.apple.x, 2) + Math.pow(head.y - this.apple.y, 2)
+      Math.pow(point.x - this.apple.x, 2) + Math.pow(point.y - this.apple.y, 2)
     );
   }
 

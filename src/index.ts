@@ -30,7 +30,17 @@ function createGameBox() {
   const score = blessed.box({
     top: HEIGHT + 2,
     width: 30,
+    height: 3,
+    style: { fg: "green" }
+  });
+
+  const logs = blessed.box({
+    top: HEIGHT + 5,
+    width: 30,
     height: 10,
+    border: {
+      type: "line"
+    },
     style: {
       fg: "green",
       border: {
@@ -41,13 +51,14 @@ function createGameBox() {
 
   screen.append(box);
   screen.append(score);
+  screen.append(logs);
   box.focus();
 
-  return { box, score };
+  return { box, score, logs };
 }
 
-const { box, score } = createGameBox();
-const renderer = new Renderer(box, score);
+const { box, score, logs } = createGameBox();
+const renderer = new Renderer(box, score, logs);
 const env = new GameEnvironment();
 
 if (MODE === "play") {

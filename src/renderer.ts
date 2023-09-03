@@ -6,10 +6,11 @@ import { GameEnvironment } from "./environment.ts";
 export class Renderer {
   constructor(
     private box: blessed.Widgets.BoxElement,
-    private score: blessed.Widgets.BoxElement
+    private score: blessed.Widgets.BoxElement,
+    private logs: blessed.Widgets.BoxElement
   ) {}
 
-  render(env: GameEnvironment) {
+  render(env: GameEnvironment, logs: string[] = []) {
     const displayState = env
       .getState()
       .map(line => line.join(""))
@@ -23,6 +24,7 @@ export class Renderer {
       env.done ? " | Game Over!" : ""
     }`;
     this.score.setContent(statusText);
+    this.logs.setContent(logs.join("\n"));
     this.box.screen.render();
   }
 }

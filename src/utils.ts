@@ -3,9 +3,9 @@ import fs from "fs";
 // Constants
 
 export const MODE: "play" | "train" = "train";
-export const FPS = 12;
-export const WIDTH = 80;
-export const HEIGHT = 30;
+export const FPS = 16;
+export const WIDTH = 50;
+export const HEIGHT = 20;
 export const UP = 0;
 export const DOWN = 1;
 export const LEFT = 2;

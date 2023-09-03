@@ -16,6 +16,7 @@ import {
 export class DqlAgent {
   private training = false;
   private model: tf.Sequential;
+  private targetModel: tf.Sequential;
   private memories: ReplayMemory[] = [];
   private maxMemories = 20000;
   private epsilon = 1; // Exploration rate
@@ -24,6 +25,7 @@ export class DqlAgent {
   private gamma = 0.95; // Discount rate
   private learningRate = 0.01;
   private batchSize = 32;
+  private commitInterval = 500;
   private episode = 1;
   private maxScore = 0;
 
@@ -34,31 +36,9 @@ export class DqlAgent {
   ) {
     renderer.render(env);
 
-    this.model = tf.sequential();
-    this.model.add(
-      tf.layers.dense({
-        units: 500,
-        inputShape: [WIDTH * HEIGHT]
-      })
-    );
-    this.model.add(tf.layers.leakyReLU({ alpha: 0.3 }));
-    this.model.add(tf.layers.dense({ units: 500 }));
-    this.model.add(tf.layers.leakyReLU({ alpha: 0.3 }));
-    this.model.add(tf.layers.dense({ units: 500 }));
-    this.model.add(tf.layers.leakyReLU({ alpha: 0.3 }));
-    this.model.add(tf.layers.dense({ units: 24 }));
-    this.model.add(tf.layers.leakyReLU({ alpha: 0.3 }));
-    this.model.add(
-      tf.layers.dense({
-        units: [UP, DOWN, LEFT, RIGHT].length,
-        activation: "linear"
-      })
-    );
-
-    this.model.compile({
-      loss: "meanSquaredError",
-      optimizer: tf.train.adam(this.learningRate)
-    });
+    this.model = this.createModel();
+    this.targetModel = this.createModel();
+    this.commitModel();
 
     box.on("keypress", (_, key) => {
       switch (key.name) {
@@ -78,6 +58,39 @@ export class DqlAgent {
 
   stop() {
     this.training = false;
+  }
+
+  private createModel() {
+    const model = tf.sequential();
+    model.add(
+      tf.layers.dense({
+        units: 500,
+        inputShape: [WIDTH * HEIGHT]
+      })
+    );
+    model.add(tf.layers.leakyReLU({ alpha: 0.3 }));
+    model.add(tf.layers.dense({ units: 500 }));
+    model.add(tf.layers.leakyReLU({ alpha: 0.3 }));
+    model.add(tf.layers.dense({ units: 500 }));
+    model.add(tf.layers.leakyReLU({ alpha: 0.3 }));
+    model.add(tf.layers.dense({ units: 24 }));
+    model.add(tf.layers.leakyReLU({ alpha: 0.3 }));
+    model.add(
+      tf.layers.dense({
+        units: [UP, DOWN, LEFT, RIGHT].length,
+        activation: "linear"
+      })
+    );
+
+    model.compile({
+      loss: "meanSquaredError",
+      optimizer: tf.train.adam(this.learningRate)
+    });
+    return model;
+  }
+
+  private commitModel() {
+    this.targetModel.setWeights(this.model.getWeights());
   }
 
   private act(state: number[]) {
@@ -110,7 +123,7 @@ export class DqlAgent {
     const nextStates = tf.tensor2d(batch.map(({ nextState }) => nextState));
 
     const qValues = this.model.predict(states) as tf.Tensor2D;
-    const nextQValues = this.model.predict(nextStates) as tf.Tensor2D;
+    const nextQValues = this.targetModel.predict(nextStates) as tf.Tensor2D;
 
     const targets = qValues.arraySync();
     const nextTargets = nextQValues.arraySync();
@@ -130,6 +143,10 @@ export class DqlAgent {
       epochs: 1,
       verbose: 0
     });
+
+    if (this.episode % this.commitInterval === 0) {
+      this.commitModel();
+    }
 
     tf.dispose([states, nextStates, qValues, nextQValues, targetTensor]);
   }

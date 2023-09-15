@@ -1,32 +1,44 @@
 import fs from "fs";
 
-// Constants
-
-export const MODE: "play" | "train" = "train";
-export const FPS = 16;
-export const WIDTH = 25;
-export const HEIGHT = 10;
-export const UP = 0;
-export const DOWN = 1;
-export const LEFT = 2;
-export const RIGHT = 3;
-
 // Types
+
+export enum Mode {
+  Play = "play",
+  TrainDQL = "train_DQL"
+}
+
+export enum Direction {
+  Up = "up",
+  Right = "right",
+  Down = "down",
+  Left = "left"
+}
+
+export enum Turn {
+  Straight = "straight",
+  Right = "right",
+  Left = "left"
+}
 
 export interface Point {
   x: number;
   y: number;
 }
 
-export type Direction = typeof UP | typeof DOWN | typeof LEFT | typeof RIGHT;
-
 export interface ReplayMemory {
   state: number[];
-  action: Direction;
+  actionIndex: number;
   reward: number;
   nextState: number[];
   done: boolean;
 }
+
+// Constants
+
+export const MODE: Mode = Mode.TrainDQL;
+export const FPS = 10;
+export const WIDTH = 50;
+export const HEIGHT = 20;
 
 // Utility functions
 

@@ -7,7 +7,7 @@
     "start": "tsx ./src/index.ts",
     "watch": "tsx watch ./src/index.ts",
     "build-docker-image": "docker build -t snake-docker .",
-    "run-docker-image": "docker run --rm -it --gpus all -p 3000:3000 -v $(pwd):/app snake-docker /bin/bash"
+    "run-docker-image": "docker run --rm -it --gpus all -p 3003:3003 -v $(pwd):/app snake-docker /bin/bash"
   },
   "repository": {
     "type": "git",

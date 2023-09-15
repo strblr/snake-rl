@@ -1,7 +1,7 @@
 import blessed from "blessed";
 import { GameEnvironment } from "./environment.ts";
 import { Renderer } from "./renderer.ts";
-import { Direction, DOWN, FPS, LEFT, RIGHT, UP } from "./utils.ts";
+import { Direction, FPS } from "./utils.ts";
 
 // The agent that plays the game
 
@@ -20,16 +20,16 @@ export class KeyboardAgent {
         case "escape":
           return process.exit(0);
         case "up":
-          this.buffer.push(UP);
+          this.buffer.push(Direction.Up);
           break;
         case "down":
-          this.buffer.push(DOWN);
+          this.buffer.push(Direction.Down);
           break;
         case "left":
-          this.buffer.push(LEFT);
+          this.buffer.push(Direction.Left);
           break;
         case "right":
-          this.buffer.push(RIGHT);
+          this.buffer.push(Direction.Right);
           break;
         case "space":
           this.timer ? this.stop() : this.start();
@@ -48,7 +48,7 @@ export class KeyboardAgent {
     if (this.timer) return;
     this.timer = setInterval(() => {
       const action = this.buffer.shift();
-      this.env.act(action);
+      this.env.act(action ?? this.env.direction);
       this.renderer.render(this.env);
     }, 1000 / FPS);
   }

@@ -3,7 +3,7 @@ import { GameEnvironment } from "./environment.ts";
 import { Renderer } from "./renderer.ts";
 import { KeyboardAgent } from "./keyboard-agent.ts";
 import { DqlAgent } from "./dql-agent.ts";
-import { HEIGHT, MODE, WIDTH } from "./utils.ts";
+import { HEIGHT, Mode, MODE, WIDTH } from "./utils.ts";
 
 // Main
 
@@ -62,7 +62,7 @@ const { box, score, logs } = createGameBox();
 const renderer = new Renderer(box, score, logs);
 const env = new GameEnvironment();
 
-if (MODE === "play") {
+if (MODE === Mode.Play) {
   new KeyboardAgent(box, env, renderer);
 } else {
   new DqlAgent(box, env, renderer);

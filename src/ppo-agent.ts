@@ -1,11 +1,6 @@
-// Check if node
-if (typeof module === "object" && module.exports) {
-  var tf = require("@tensorflow/tfjs");
-}
+// @ts-nocheck
 
-function log() {
-  console.log("[PPO]", ...arguments);
-}
+import * as tf from "@tensorflow/tfjs-node-gpu";
 
 class BaseCallback {
   constructor() {
@@ -175,7 +170,7 @@ class Buffer {
   }
 }
 
-class PPO {
+export class PPOAgent {
   constructor(env, config) {
     const configDefault = {
       nSteps: 512,
@@ -577,15 +572,11 @@ class PPO {
       await this.collectRollouts(callback);
       iteration += 1;
       if (logInterval && iteration % logInterval === 0) {
-        log(`Timesteps: ${this.numTimesteps}`);
+        this.log(`Timesteps: ${this.numTimesteps}`);
       }
       this.train();
     }
 
     callback.onTrainingEnd(this);
   }
-}
-
-if (typeof module === "object" && module.exports) {
-  module.exports = PPO;
 }

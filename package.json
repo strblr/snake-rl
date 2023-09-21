@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Reinforcement learning for the game of snake",
   "main": "src/index.ts",
+  "type": "module",
   "scripts": {
     "start": "tsx ./src/index.ts",
     "watch": "tsx watch ./src/index.ts",

@@ -554,9 +554,10 @@ export class PPOAgent {
     const learnConfigDefault = {
       totalTimesteps: 1000,
       logInterval: 1,
-      callback: null
+      callback: null,
+      controller: { go: true }
     };
-    let { totalTimesteps, logInterval, callback } = Object.assign(
+    let { totalTimesteps, logInterval, callback, controller } = Object.assign(
       {},
       learnConfigDefault,
       learnConfig
@@ -568,7 +569,8 @@ export class PPOAgent {
 
     callback.onTrainingStart(this);
 
-    while (this.numTimesteps < totalTimesteps) {
+    //while (this.numTimesteps < totalTimesteps) {
+    while (await waitForGo(controller)) {
       await this.collectRollouts(callback);
       iteration += 1;
       if (logInterval && iteration % logInterval === 0) {
@@ -579,4 +581,11 @@ export class PPOAgent {
 
     callback.onTrainingEnd(this);
   }
+}
+
+async function waitForGo(controller) {
+  while (!controller.go) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  return true;
 }

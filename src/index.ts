@@ -1,69 +1,42 @@
-import blessed from "blessed";
-import { GameEnvironment } from "./environment.ts";
-import { Renderer } from "./renderer.ts";
-import { KeyboardAgent } from "./keyboard-agent.ts";
-import { DqlAgent } from "./dql-agent.ts";
-import { HEIGHT, Mode, MODE, WIDTH } from "./utils.ts";
+import * as tf from "@tensorflow/tfjs-node-gpu";
+import { PPOAgent } from "./agent";
+import { SnakeEnvironment } from "./environment";
+import { Renderer } from "./renderer";
 
-// Main
+const controller = { go: true };
+let maxScore = 0;
 
-function createGameBox() {
-  const screen = blessed.screen({
-    smartCSR: true
-  });
-
-  const box = blessed.box({
-    width: WIDTH + 2,
-    height: HEIGHT + 2,
-    border: {
-      type: "line"
+const renderer = new Renderer({
+  width: SnakeEnvironment.WIDTH,
+  height: SnakeEnvironment.HEIGHT,
+  onKey: {
+    space: () => {
+      controller.go = !controller.go;
     },
-    style: {
-      bg: "black",
-      fg: "green",
-      border: {
-        fg: "green"
-      }
+    escape: () => {
+      process.exit();
     }
-  });
+  }
+});
 
-  const score = blessed.box({
-    top: HEIGHT + 2,
-    width: 30,
-    height: 3,
-    style: { fg: "green" }
-  });
-
-  const logs = blessed.box({
-    top: HEIGHT + 5,
-    width: WIDTH + 2,
-    height: 12,
-    scrollable: true,
-    border: {
-      type: "line"
-    },
-    style: {
-      fg: "green",
-      border: {
-        fg: "green"
-      }
-    }
-  });
-
-  screen.append(box);
-  screen.append(score);
-  screen.append(logs);
-  box.focus();
-
-  return { box, score, logs };
+async function onStep() {
+  const score = env.getScore();
+  if (score > maxScore) maxScore = score;
+  renderer.render(env.toString(), `Score: ${score}`, [
+    "Timestep: " + (ppo as any).numTimesteps,
+    "Game: " + env.gameNumber,
+    "Tensors: " + tf.memory().numTensors,
+    "Max Score: " + maxScore
+  ]);
+  await new Promise(resolve => setTimeout(resolve, 1));
 }
 
-const { box, score, logs } = createGameBox();
-const renderer = new Renderer(box, score, logs);
-const env = new GameEnvironment();
+const env = new SnakeEnvironment(onStep);
 
-if (MODE === Mode.Play) {
-  new KeyboardAgent(box, env, renderer);
-} else {
-  new DqlAgent(box, env, renderer);
-}
+const ppo = new PPOAgent(env, {});
+
+await ppo.learn({
+  totalTimesteps: 70000,
+  logInterval: 0,
+  controller
+});

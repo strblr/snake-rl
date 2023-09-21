@@ -1,14 +1,43 @@
-import { Direction, HEIGHT, Point, Turn, WIDTH } from "./utils.ts";
+import { Environment } from ".";
 
-// Game class to manage the snake state
+export enum Direction {
+  Up = 0,
+  Right = 1,
+  Down = 2,
+  Left = 3
+}
 
-export class GameEnvironment {
+export enum Turn {
+  Straight = 0,
+  Right = 1,
+  Left = 2
+}
+
+export interface Point {
+  x: number;
+  y: number;
+}
+
+export class SnakeEnvironment extends Environment {
+  static readonly WIDTH = 50;
+  static readonly HEIGHT = 20;
+
+  gameNumber = 0;
   private snake: Point[] = [];
   private apple: Point = { x: 0, y: 0 };
   direction = Direction.Right;
-  done = false;
 
-  constructor() {
+  constructor(public onStep?: () => void | Promise<void>) {
+    super(
+      {
+        class: "Discrete",
+        n: 3
+      },
+      {
+        shape: [11],
+        dtype: "float32"
+      }
+    );
     this.reset();
   }
 
@@ -19,15 +48,16 @@ export class GameEnvironment {
       { x: 12, y: 5 }
     ];
     this.generateApple();
-    this.direction = Direction.Right;
-    this.done = false;
+    this.direction = Math.floor(Math.random() * 4);
+    this.gameNumber++;
+    return this.getState();
   }
 
   private generateApple() {
     do {
       this.apple = {
-        x: Math.floor(Math.random() * WIDTH),
-        y: Math.floor(Math.random() * HEIGHT)
+        x: Math.floor(Math.random() * SnakeEnvironment.WIDTH),
+        y: Math.floor(Math.random() * SnakeEnvironment.HEIGHT)
       };
     } while (
       this.snake.some(
@@ -36,41 +66,58 @@ export class GameEnvironment {
     );
   }
 
-  act(directionOrTurn: Direction | Turn, isTurn = false): number {
-    if (this.done) return 0;
-    this.direction = !isTurn
-      ? (directionOrTurn as Direction)
-      : this.getDirectionOfTurn(directionOrTurn as Turn);
+  async step(turn: Turn) {
+    let done = false,
+      reward = 0;
+    this.direction = this.getDirectionOfTurn(turn);
     const newHead = this.getNeighbour(this.direction);
-    if (this.isDangerous(newHead)) {
-      this.done = true;
-      return -20;
-    }
-    const oldHead = this.getHead();
-    this.snake.push(newHead);
+
     if (newHead.x === this.apple.x && newHead.y === this.apple.y) {
       this.generateApple();
-      return 10;
+      reward = 10;
     } else {
       this.snake.shift();
-      if (this.getDistanceToApple(newHead) < this.getDistanceToApple(oldHead)) {
-        return 1;
+      if (this.isDangerous(newHead)) {
+        done = true;
+        reward = -20;
+      } else if (
+        this.getDistanceToApple(newHead) <
+        this.getDistanceToApple(this.getHead())
+      ) {
+        reward = 1;
       }
     }
-    return -2;
+    this.snake.push(newHead);
+    await this.onStep?.();
+    return [this.getState(), reward, done] as const;
   }
 
   getScore() {
     return this.snake.length;
   }
 
-  getDisplayState() {
-    const state: string[][] = Array.from({ length: HEIGHT }, () =>
-      Array(WIDTH).fill(" ")
+  toString() {
+    const state: string[][] = Array.from(
+      { length: SnakeEnvironment.HEIGHT },
+      () => Array(SnakeEnvironment.WIDTH).fill(" ")
     );
-    for (const node of this.snake) state[node.y][node.x] = "▒";
+    for (const node of this.snake) {
+      if (
+        node.x >= 0 &&
+        node.x < SnakeEnvironment.WIDTH &&
+        node.y >= 0 &&
+        node.y < SnakeEnvironment.HEIGHT
+      )
+        state[node.y][node.x] = "▒";
+    }
     const head = this.getHead();
-    state[head.y][head.x] = "█";
+    if (
+      head.x >= 0 &&
+      head.x < SnakeEnvironment.WIDTH &&
+      head.y >= 0 &&
+      head.y < SnakeEnvironment.HEIGHT
+    )
+      state[head.y][head.x] = "█";
     state[this.apple.y][this.apple.x] = "◉";
     return state.map(row => row.join("")).join("\n");
   }
@@ -129,9 +176,9 @@ export class GameEnvironment {
   private isDangerous({ x, y }: Point) {
     return (
       x < 0 ||
-      x >= WIDTH ||
+      x >= SnakeEnvironment.WIDTH ||
       y < 0 ||
-      y >= HEIGHT ||
+      y >= SnakeEnvironment.HEIGHT ||
       this.snake.some(node => node.x === x && node.y === y)
     );
   }

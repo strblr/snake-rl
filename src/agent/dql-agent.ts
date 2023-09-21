@@ -2,11 +2,19 @@ import * as tf from "@tensorflow/tfjs-node-gpu";
 import blessed from "blessed";
 import { GameEnvironment } from "./environment.ts";
 import { Renderer } from "./renderer.ts";
-import { ReplayMemory, Turn } from "./utils.ts";
+import { Turn } from "./utils.ts";
 
 const Actions = [Turn.Straight, Turn.Right, Turn.Left];
 
-export class DqlAgent {
+export interface ReplayMemory {
+  state: number[];
+  actionIndex: number;
+  reward: number;
+  nextState: number[];
+  done: boolean;
+}
+
+export class DQLAgent {
   private training = false;
 
   // Model attributes

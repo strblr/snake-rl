@@ -33,7 +33,9 @@ async function onStep() {
 
 const env = new SnakeEnvironment(onStep);
 
-const ppo = new PPOAgent(env, {});
+const ppo = new PPOAgent(env, {
+  resetOnRolloutEnd: false
+});
 
 await ppo.learn({
   totalTimesteps: 70000,

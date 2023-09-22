@@ -174,6 +174,7 @@ export class PPOAgent {
   constructor(env, config) {
     const configDefault = {
       nSteps: 512,
+      resetOnRolloutEnd: true,
       nEpochs: 10,
       policyLearningRate: 1e-3,
       valueLearningRate: 1e-3,
@@ -181,8 +182,8 @@ export class PPOAgent {
       targetKL: 0.01,
       useSDE: false, // TODO: State Dependent Exploration (gSDE)
       netArch: {
-        pi: [32, 32],
-        vf: [32, 32]
+        pi: [64, 64],
+        vf: [64, 64]
       },
       activation: "relu",
       verbose: 0
@@ -246,7 +247,7 @@ export class PPOAgent {
   createActor() {
     const input = tf.layers.input({ shape: this.env.observationSpace.shape });
     let l = input;
-    this.config.netArch.pi.forEach((units, i) => {
+    this.config.netArch.pi.forEach(units => {
       l = tf.layers
         .dense({
           units,
@@ -280,7 +281,7 @@ export class PPOAgent {
     // Initialize critic
     const input = tf.layers.input({ shape: this.env.observationSpace.shape });
     let l = input;
-    this.config.netArch.vf.forEach((units, i) => {
+    this.config.netArch.vf.forEach(units => {
       l = tf.layers
         .dense({
           units: units,
@@ -494,7 +495,9 @@ export class PPOAgent {
             )[0][0];
         this.buffer.finishTrajectory(lastValue);
         numEpisodes += 1;
-        this.lastObservation = this.env.reset();
+        if (done || this.config.resetOnRolloutEnd) {
+          this.lastObservation = this.env.reset();
+        }
       }
     }
 

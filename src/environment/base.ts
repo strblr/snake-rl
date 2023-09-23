@@ -1,27 +1,28 @@
-import { DataType, Shape } from "@tensorflow/tfjs-node-gpu";
+import * as tf from "@tensorflow/tfjs-node-gpu";
 
 export type ActionSpace = DiscreteActionSpace | BoxActionSpace;
 
 export interface DiscreteActionSpace {
   class: "Discrete";
   n: number;
-  dtype?: DataType;
+  dtype?: tf.DataType;
 }
 
 export interface BoxActionSpace {
   class: "Box";
-  shape: Shape;
+  shape: number[];
   low: number;
   high: number;
-  dtype?: DataType;
+  dtype?: tf.DataType;
 }
 
 export interface ObservationSpace {
-  shape: Shape;
-  dtype: DataType;
+  shape: number[];
+  dtype: tf.DataType;
 }
 
-export type StepResult = readonly [number[], number, boolean];
+export type StepResult = readonly [Observation, number, boolean];
+export type Observation = number[];
 
 export abstract class Environment {
   protected constructor(

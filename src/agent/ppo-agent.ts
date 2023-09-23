@@ -2,92 +2,6 @@
 
 import * as tf from "@tensorflow/tfjs-node-gpu";
 
-class BaseCallback {
-  constructor() {
-    this.nCalls = 0;
-  }
-
-  _onStep(alg) {
-    return true;
-  }
-  onStep(alg) {
-    this.nCalls += 1;
-    return this._onStep(alg);
-  }
-
-  _onTrainingStart(alg) {}
-  onTrainingStart(alg) {
-    this._onTrainingStart(alg);
-  }
-
-  _onTrainingEnd(alg) {}
-  onTrainingEnd(alg) {
-    this._onTrainingEnd(alg);
-  }
-
-  _onRolloutStart(alg) {}
-  onRolloutStart(alg) {
-    this._onRolloutStart(alg);
-  }
-
-  _onRolloutEnd(alg) {}
-  onRolloutEnd(alg) {
-    this._onRolloutEnd(alg);
-  }
-}
-
-class FunctionalCallback extends BaseCallback {
-  constructor(callback) {
-    super();
-    this.callback = callback;
-  }
-
-  _onStep(alg) {
-    if (this.callback) {
-      return this.callback(alg);
-    }
-    return true;
-  }
-}
-
-class DictCallback extends BaseCallback {
-  constructor(callback) {
-    super();
-    this.callback = callback;
-  }
-
-  _onStep(alg) {
-    if (this.callback && this.callback.onStep) {
-      return this.callback.onStep(alg);
-    }
-    return true;
-  }
-
-  _onTrainingStart(alg) {
-    if (this.callback && this.callback.onTrainingStart) {
-      this.callback.onTrainingStart(alg);
-    }
-  }
-
-  _onTrainingEnd(alg) {
-    if (this.callback && this.callback.onTrainingEnd) {
-      this.callback.onTrainingEnd(alg);
-    }
-  }
-
-  _onRolloutStart(alg) {
-    if (this.callback && this.callback.onRolloutStart) {
-      this.callback.onRolloutStart(alg);
-    }
-  }
-
-  _onRolloutEnd(alg) {
-    if (this.callback && this.callback.onRolloutEnd) {
-      this.callback.onRolloutEnd(alg);
-    }
-  }
-}
-
 class Buffer {
   constructor(bufferConfig) {
     const bufferConfigDefault = {
@@ -407,27 +321,12 @@ export class PPOAgent {
     });
   }
 
-  _initCallback(callback) {
-    // Function, not class
-    if (typeof callback === "function") {
-      if (callback.prototype.constructor === undefined) {
-        return new FunctionalCallback(callback);
-      }
-      return callback;
-    }
-    if (typeof callback === "object") {
-      return new DictCallback(callback);
-    }
-    return new BaseCallback();
-  }
-
-  async collectRollouts(callback) {
+  async collectRollouts() {
     if (this.lastObservation === null) {
       this.lastObservation = this.env.reset();
     }
 
     this.buffer.reset();
-    callback.onRolloutStart(this);
 
     let sumReturn = 0;
     let sumLength = 0;
@@ -475,8 +374,6 @@ export class PPOAgent {
       // Update global timestep counter
       this.numTimesteps += 1;
 
-      callback.onStep(this);
-
       this.buffer.add(
         this.lastObservation,
         action,
@@ -500,8 +397,6 @@ export class PPOAgent {
         }
       }
     }
-
-    callback.onRolloutEnd(this);
   }
 
   async train(config) {
@@ -557,32 +452,25 @@ export class PPOAgent {
     const learnConfigDefault = {
       totalTimesteps: 1000,
       logInterval: 1,
-      callback: null,
       controller: { go: true }
     };
-    let { totalTimesteps, logInterval, callback, controller } = Object.assign(
+    let { totalTimesteps, logInterval, controller } = Object.assign(
       {},
       learnConfigDefault,
       learnConfig
     );
 
-    callback = this._initCallback(callback);
-
     let iteration = 0;
-
-    callback.onTrainingStart(this);
 
     //while (this.numTimesteps < totalTimesteps) {
     while (await waitForGo(controller)) {
-      await this.collectRollouts(callback);
+      await this.collectRollouts();
       iteration += 1;
       if (logInterval && iteration % logInterval === 0) {
         this.log(`Timesteps: ${this.numTimesteps}`);
       }
       this.train();
     }
-
-    callback.onTrainingEnd(this);
   }
 }
 

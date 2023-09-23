@@ -22,7 +22,7 @@ export interface ObservationSpace {
 }
 
 export type StepResult = readonly [Observation, number, boolean];
-export type Observation = number[];
+export type Observation = any[];
 
 export abstract class Environment {
   protected constructor(
@@ -32,5 +32,5 @@ export abstract class Environment {
 
   abstract step(action: number): StepResult | Promise<StepResult>;
 
-  abstract reset(): number[];
+  abstract reset(): Observation;
 }

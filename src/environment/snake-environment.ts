@@ -48,7 +48,9 @@ export class SnakeEnvironment extends Environment {
       { x: 12, y: 5 }
     ];
     this.generateApple();
-    this.direction = Math.floor(Math.random() * 4);
+    this.direction = Direction.Right;
+    const turn = Math.floor(Math.random() * 3);
+    this.direction = this.getDirectionOfTurn(turn);
     this.gameNumber++;
     return this.getState();
   }
@@ -74,7 +76,7 @@ export class SnakeEnvironment extends Environment {
 
     if (newHead.x === this.apple.x && newHead.y === this.apple.y) {
       this.generateApple();
-      reward = 10;
+      reward = 20;
     } else {
       this.snake.shift();
       if (this.isDangerous(newHead)) {
